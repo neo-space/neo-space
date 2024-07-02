@@ -5,19 +5,21 @@ use camera::Camera;
 
 mod grid;
 use grid::draw_grid;
-use scrollbar::draw_scrollbar;
+use scrollbar::{draw_scrollbar, ScrollBarConfig};
 
 mod scrollbar;
 
 const MIN_ZOOM: f32 = 0.1;
 const MAX_ZOOM: f32 = 8.0;
 const ZOOM_SPEED: f32 = 0.05;
-const SCROLL_SPEED: f32 = 5.0; // Reduced scroll speed
-const BACKGROUND_COLOR: Color = Color::new(0.98, 0.98, 0.98, 1.0);
+const SCROLL_SPEED: f32 = 2.0; // Reduced scroll speed
+const BACKGROUND_COLOR: Color = Color::new(0.95, 0.96, 0.98, 1.0);
 
 #[macroquad::main(window_conf)]
 async fn main() {
+    let no_scroll_offset: f32 = 0.0;
     let mut camera = Camera::new();
+    let scroll_bar_config: ScrollBarConfig = ScrollBarConfig::new();
     let mut is_dragging = false;
     let mut last_mouse_pos = Vec2::ZERO;
 
@@ -43,8 +45,9 @@ async fn main() {
         // Handle scrolling and zooming
         let (wheel_x, wheel_y) = mouse_wheel();
         if is_key_down(KeyCode::LeftControl) || is_key_down(KeyCode::RightControl) {
+            // TODO: where is the 
             // Zoom with Ctrl + scroll
-            if wheel_y != 0.0 {
+            if wheel_y != no_scroll_offset {
                 let zoom_factor = 1.0 + (wheel_y * ZOOM_SPEED);
                 let new_zoom = (camera.zoom * zoom_factor).clamp(MIN_ZOOM, MAX_ZOOM);
                 let zoom_change = new_zoom / camera.zoom;
@@ -62,9 +65,10 @@ async fn main() {
         }
 
         draw_grid(&camera);
-        draw_scrollbar(&camera);
+        draw_scrollbar(&scroll_bar_config, &camera);
 
         // TODO: refactor to display stat bar
+        // make these variables constant or at least alterable somewhere else
         draw_text(
             &format!(
                 "Camera: ({:.2}, {:.2}), Zoom: {:.2}",
@@ -85,6 +89,7 @@ fn window_conf() -> Conf {
         window_title: "Infinite Canvas".to_owned(),
         window_width: 1200,
         window_height: 800,
+        // can add the frame rate here
         ..Default::default()
     }
 }
