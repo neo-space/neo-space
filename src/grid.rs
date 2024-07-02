@@ -6,6 +6,7 @@ use crate::camera::Camera;
 const GRID_SIZE: f32 = 20.0;
 const NORMAL_DOT_COLOR: Color = Color::new(0.7, 0.9, 1.0, 1.0);
 const EMPHASIZED_DOT_COLOR: Color = Color::new(0.4, 0.7, 0.9, 1.0);
+pub const BACKGROUND_COLOR: Color = Color::new(0.95, 0.96, 0.98, 1.0);
 
 pub fn draw_grid(camera: &Camera) {
     let top_left = camera.screen_to_world(Vec2::ZERO);
