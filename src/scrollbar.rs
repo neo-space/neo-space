@@ -1,8 +1,13 @@
 use macroquad::{
-    color::Color, shapes::draw_rectangle, window::{screen_height, screen_width}
+    color::Color, input::{is_key_down, mouse_position, KeyCode}, math::Vec2, shapes::draw_rectangle, window::{screen_height, screen_width}
 };
 
 use crate::camera::Camera;
+
+const MIN_ZOOM: f32 = 0.1;
+const MAX_ZOOM: f32 = 8.0;
+const ZOOM_SPEED: f32 = 0.05;
+const SCROLL_SPEED: f32 = 2.0;
 
 pub struct ScrollBarConfig {
     pub visible_area_factor: f32,
@@ -50,4 +55,26 @@ pub fn draw_scrollbar(scroll_bar_config: &ScrollBarConfig, camera: &Camera) {
         scrollbar_height,
         scrollbar_foreground_color,
     );
+}
+
+pub fn handle_scroll(scroll: &(f32, f32), camera: &mut Camera) {
+    let &(wheel_x, wheel_y) = scroll;
+    if is_key_down(KeyCode::LeftControl) || is_key_down(KeyCode::RightControl) {
+        if wheel_y != 0.0 {
+            let zoom_factor = 1.0 + (wheel_y * ZOOM_SPEED);
+            let new_zoom = (camera.zoom * zoom_factor).clamp(MIN_ZOOM, MAX_ZOOM);
+            
+            let mouse_pos: Vec2 = mouse_position().into();
+            let before = camera.screen_to_world(mouse_pos);
+            
+            camera.zoom = new_zoom;
+            
+            let after = camera.screen_to_world(mouse_pos);
+            camera.position += before - after;
+        }
+    } else {
+        // Scroll vertically and horizontally without Ctrl
+        camera.position.y += wheel_y * SCROLL_SPEED / camera.zoom;
+        camera.position.x += wheel_x * SCROLL_SPEED / camera.zoom;
+    }
 }
