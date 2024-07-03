@@ -45,3 +45,7 @@ git checkout -b my-new-feature
 git push origin my-new-feature
 ```
 Once thats there, raise the PR against neo-space/neo-space on github
+
+Try your best to follow conventional commits https://www.conventionalcommits.org/en/v1.0.0/
+I can't promise that I will only ever be conventional, nor do I promise that I will only accept other's PR's if they are conventional,
+but why not try?
