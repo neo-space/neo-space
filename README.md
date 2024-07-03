@@ -1,7 +1,11 @@
 # neo-space
-Infinite Canvas in Rust Webassembly. 
-Draw, diagram, generate, animate, share. Local or in browser. 
-NO CORPORATE MIDDLEMEN.
+"In the future, frontends will be written in C, C++, and Rust. Backends will be written in Typescript." - You if contribute to this project
+
+A Rust based open source infinite canvas project that will attempt to have many of the features of figma, and certainly more features than freeform.
+This project will work both as WebAssembly compiled from Rust and as a standalone native Rust application. Write and add any plugin you want.
+Download, embed, share the code as much as you want. No corporate middle men. 
+
+Eventually there will be a SDK developed allowing for the easy integration of the canvas and various drawing features. 
 
 # helpful git commands for contributing
 fork the original repo, download it, and work off a new branch
