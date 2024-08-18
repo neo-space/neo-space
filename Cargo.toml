@@ -1,8 +1,7 @@
-[package]
-name = "canvas"
-version = "0.1.0"
-edition = "2021"
 
-[dependencies]
-macroquad = "0.3"
-egui-macroquad = "0.15"
+
+[workspace]
+members = ["rendering-engine"]
+
+[profile.release]
+opt-level = "s"

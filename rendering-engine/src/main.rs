@@ -28,10 +28,10 @@ async fn main() {
     };
     let current_user_action_mode = UserActionMode::DRAG;
 
-    // Load cursor images
+    // Load cursor images, path is given from root Cargo.toml not package level
     let cursors = Cursors {
-        hand: load_texture("src/assets/hand_cursor.png").await.unwrap(),
-        grab: load_texture("src/assets/grab_cursor.png").await.unwrap(),
+        hand: load_texture("rendering-engine/src/assets/hand_cursor.png").await.unwrap(),
+        grab: load_texture("rendering-engine/src/assets/grab_cursor.png").await.unwrap(),
     };
 
         // Hide the default system cursor
