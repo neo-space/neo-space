@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "what you draw can become what you want it to",
     "scripts": {
+      "frontend": "cd frontend && npm start",
       "start": "npm run build:rust && cd frontend && npm start",
       "build": "npm run build:rust && npm run build:frontend",
       "build:rust": "cd rust-drawing-engine && wasm-pack build --target web --out-dir ../frontend/pkg",

@@ -1,7 +1,7 @@
 {
     "name": "neo-space-frontend",
     "version": "1.0.0",
-    "description": "Frontend for neo-space",
+    "description": "frontend for neo-space",
     "scripts": {
       "start": "webpack serve --mode development",
       "build": "webpack --mode production"
