@@ -1,7 +1,8 @@
 
 
 [workspace]
-members = ["rendering-engine"]
+members = ["rendering-engine", "tiny-neo-space"]
+
 
 [profile.release]
 opt-level = "s"

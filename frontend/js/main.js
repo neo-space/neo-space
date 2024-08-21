@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let translateX = 0;
     let translateY = 0;
 
-    const MAX_SCALE = 5;    // Zoom in limit
-    const MIN_SCALE = 0.25; // Zoom out limit
+    const MAX_SCALE = 5;
+    const MIN_SCALE = 0.25;
 
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const baseBgSize = 20;
         let bgSize = baseBgSize * scale;
         
-        // Implement level of detail
         let lodLevel = 0;
         while (bgSize < 10 && lodLevel < 3) {
             bgSize *= 2;
@@ -34,22 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         gridContainer.style.backgroundPosition = `${offsetX}px ${offsetY}px`;
         gridContainer.style.transform = `scale(${scale})`;
-        
         gridContainer.style.backgroundSize = `${bgSize}px ${bgSize}px`;
-        
-        // Adjust dot size based on scale and LOD
-        const baseDotSize = 1;
-        const minDotSize = 0.5;
-        const maxDotSize = 2;
-        const dotSize = Math.min(maxDotSize, Math.max(minDotSize, baseDotSize * Math.pow(2, lodLevel) * Math.pow(scale, 0.5)));
-        
-        // Adjust dot opacity based on scale
-        const baseOpacity = 0.5;
-        const minOpacity = 0.2;
-        const maxOpacity = 0.8;
-        const opacity = Math.min(maxOpacity, Math.max(minOpacity, baseOpacity * Math.pow(scale, 0.3)));
-        
-        gridContainer.style.backgroundImage = `radial-gradient(circle, rgba(0, 0, 0, ${opacity}) ${dotSize}px, transparent ${dotSize}px)`;
     }
 
     function update() {
@@ -60,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isDragging = false;
     let lastX, lastY;
 
-    canvas.addEventListener('mousedown', (e) => {
+    gridContainer.addEventListener('mousedown', (e) => {
         isDragging = true;
         lastX = e.clientX;
         lastY = e.clientY;
@@ -83,11 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Zoom functionality
-    canvas.addEventListener('wheel', (e) => {
+    gridContainer.addEventListener('wheel', (e) => {
         e.preventDefault();
         const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
         
-        const rect = canvas.getBoundingClientRect();
+        const rect = gridContainer.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
         
