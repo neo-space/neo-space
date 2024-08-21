@@ -1,7 +1,7 @@
 
 
 [workspace]
-members = [ "hello-wasm","rendering-engine", "tiny-neo-space", "hello-wasm"]
+members = [ "rust-packages/hello-wasm","rendering-engine", "rust-packages/tiny-neo-space"]
 
 
 [profile.release]
