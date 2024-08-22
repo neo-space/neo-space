@@ -1,0 +1,42 @@
+
+/*
+    remove the default margin and padding to take up full window
+    set body to take up 100% height and width of viewport
+*/
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/*
+    width and height set grid to be x% of the window, in this case 4x the size
+    grid is positioned outside of the viewport (position, top, left)
+    radial gradiant draws the dot grid pattern
+*/
+
+#grid-container {
+    width: 400%;
+    height: 400%;
+    position: absolute;
+    top: -150%;
+    left: -150%;
+    background-image: radial-gradient(circle, rgba(62, 122, 133, 0.8) 1.1px, transparent 1.1px);
+    background-size: 20px 20px;
+    transform-origin: center center;
+    z-index: 1;
+}
+
+
+
+#canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #d4d4d4;
+    z-index: 0;
+}
