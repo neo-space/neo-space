@@ -1,9 +1,11 @@
 mod utils;
+mod canvas;
 
 use wasm_bindgen::prelude::*;
 use web_sys::CanvasRenderingContext2d;
-use std::cell::{self, Cell}; // concurrency primative that allows for interior mutability
+use std::cell::Cell; // concurrency primative that allows for interior mutability
 use std::rc::Rc; // a way to have multiple owners of the same data
+
 
 #[wasm_bindgen(start)]
 fn start() -> Result<(), JsValue> { // indicates succeed w JsValue fail with no meaninful return value

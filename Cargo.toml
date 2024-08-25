@@ -4,7 +4,6 @@
 members = [ 
     "rendering-engine", 
     "rust-packages/hello-wasm",
-    "rust-packages/tiny-neo-space",
     "rust-packages/paint-wasm",
     "rust-packages/infinite-paint-wasm"
 ]
