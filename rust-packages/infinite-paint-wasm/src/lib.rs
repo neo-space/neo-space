@@ -11,7 +11,7 @@ mod appstate;
 use appstate::State;
 mod mouse;
 
-
+// TODO: Remove this comment
 #[wasm_bindgen(start)]
 fn start() -> Result<(), JsValue> { // indicates succeed w JsValue fail with no meaninful return value
     // initialize the canvas element
