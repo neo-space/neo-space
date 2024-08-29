@@ -30,30 +30,53 @@ fn start() -> Result<(), JsValue> { // indicates succeed w JsValue fail with no 
 
     let state = Rc::new(State::new(context.into()));
 
+    // adding the mouse event handlers (clousures)
     add_mouse_event_listeners(&canvas, state.clone())?;
 
-    // Render Loop
-    {
-        let f: Rc<RefCell<Option<Closure<dyn FnMut()>>>> = Rc::new(RefCell::new(None));
-        let g = f.clone();
-        *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-            let state = state.clone();
-            if *state.mouse_info.left_click.borrow() {
-                // TODO: there will be deeper functionality here based on user action mode
-                state.draw_line();
-            }
+    // render loop closure
+    // {
+    //     let f: Rc<RefCell<Option<Closure<dyn FnMut()>>>> = Rc::new(RefCell::new(None));
+    //     let g = f.clone();
+    //     *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+    //         let state = state.clone();
+    //         if state.mouse_info().is_pressed() {
+    //             // TODO: there will be deeper functionality here based on user action mode
+    //             state.draw_line();
+    //         }
     
-            request_animation_frame(f.borrow().as_ref().unwrap());
-        }) as Box<dyn FnMut()>));
+    //         request_animation_frame(f.borrow().as_ref().unwrap());
+    //     }) as Box<dyn FnMut()>));
     
-        request_animation_frame(g.borrow().as_ref().unwrap());
-    }
+    //     request_animation_frame(g.borrow().as_ref().unwrap());
+    // }
+    start_animation_loop(state.clone());
 
     Ok(())
 }
 
-fn request_animation_frame(f: &Closure<dyn FnMut()>) -> i32 {
-    window().unwrap().request_animation_frame(f.as_ref().unchecked_ref())
-        .expect("should register `requestAnimationFrame` OK")
+pub fn start_animation_loop(state: Rc<State>) -> Result<(), JsValue> {
+    let window = window().unwrap();
+    
+    let f = Rc::new(RefCell::new(None));
+    let g = f.clone();
+
+    // DON'T import borrow, it will cause errors, we want RefCell's borrow here
+    *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+        if state.mouse_info().is_pressed() {
+            state.draw_line();
+        }
+
+        request_animation_frame(f.borrow().as_ref().unwrap());
+    }) as Box<dyn FnMut()>));
+
+    request_animation_frame(g.borrow().as_ref().unwrap());
+
+    Ok(())
+}
+
+fn request_animation_frame(f: &Closure<dyn FnMut()>) {
+    window().unwrap()
+        .request_animation_frame(f.as_ref().unchecked_ref())
+        .unwrap();
 }
 

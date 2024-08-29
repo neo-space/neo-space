@@ -1,46 +1,64 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{cell::Cell, rc::Rc};
 
 use wasm_bindgen::{prelude::Closure, JsCast, JsValue};
 use web_sys::{HtmlCanvasElement, MouseEvent};
 
 use crate::appstate::State;
 
-
-
 pub(crate) struct MouseInfo {
-    pub left_click: Rc<RefCell<bool>>,
-    pub x_coord: Rc<RefCell<f64>>,
-    pub y_coord: Rc<RefCell<f64>>,
-    pub last_x: Rc<RefCell<Option<f64>>>,
-    pub last_y: Rc<RefCell<Option<f64>>>
+    pub left_click: Cell<bool>,
+    pub x_coord: Cell<f64>,
+    pub y_coord: Cell<f64>,
+    pub last_x: Cell<Option<f64>>,
+    pub last_y: Cell<Option<f64>>
 }
 
 impl MouseInfo {
     pub fn new() -> MouseInfo {
+        // Cell used here because simpler, more efficient. Refcell uses Runtime borrow checking
+        // Cell also has get and set methods
+        // Cell ideal for Copy on primitive datatypes
         MouseInfo {
-            left_click: Rc::new(RefCell::new(false)),
-            x_coord: Rc::new(RefCell::new(0.0)),
-            y_coord: Rc::new(RefCell::new(0.0)),
-            last_x: Rc::new(RefCell::new(None)),
-            last_y: Rc::new(RefCell::new(None)),
+            left_click: Cell::new(false),
+            x_coord: Cell::new(0.0),
+            y_coord: Cell::new(0.0),
+            last_x: Cell::new(None),
+            last_y: Cell::new(None),
         }
     }
 
-    pub fn pressed(&self) {
-        *self.left_click.borrow_mut() = true;
-        *self.last_x.borrow_mut() = None;
-        *self.last_y.borrow_mut() = None;
+    pub fn press(&self) {
+        self.left_click.set(true);
+        self.last_x.set(None);
+        self.last_y.set(None);
     }
 
     pub fn released(&self) {
-        *self.left_click.borrow_mut() = false;
-        *self.last_x.borrow_mut() = None;
-        *self.last_y.borrow_mut() = None;
+        self.left_click.set(false);
+        self.last_x.set(None);
+        self.last_y.set(None);
     }
 
-    pub fn update_position(&self, x: f64, y:f64) {
-        *self.x_coord.borrow_mut() = x;
-        *self.y_coord.borrow_mut() = y;
+    pub fn is_pressed(&self) -> bool {
+        self.left_click.get()
+    }
+
+    pub fn update_position(&self, x: f64, y: f64) {
+        self.x_coord.set(x);
+        self.y_coord.set(y);
+    }
+
+    pub fn get_coords(&self) -> (f64, f64) {
+        (self.x_coord.get(), self.y_coord.get())
+    }
+
+    pub fn get_last_coords(&self) -> (Option<f64>, Option<f64>) {
+        (self.last_x.get(), self.last_y.get())
+    }
+
+    pub fn update_last_coords(&self, x: f64, y: f64) {
+        self.last_x.set(Some(x));
+        self.last_y.set(Some(y));
     }
 }
 
@@ -48,20 +66,20 @@ impl MouseInfo {
 
 fn create_mousedown_handler(state: Rc<State>) -> Closure<dyn FnMut(MouseEvent)> {
     Closure::wrap(Box::new(move |event: MouseEvent| {
-        state.mouse_info.pressed();
-        state.mouse_info.update_position(event.offset_x() as f64, event.offset_y() as f64);
+        state.mouse_info().press();
+        state.mouse_info().update_position(event.offset_x() as f64, event.offset_y() as f64);
     }) as Box<dyn FnMut(MouseEvent)>)
 }
 
 fn create_mousemove_handler(state: Rc<State>) -> Closure<dyn FnMut(MouseEvent)> {
     Closure::wrap(Box::new(move |event: MouseEvent| {
-        state.mouse_info.update_position(event.offset_x() as f64, event.offset_y() as f64);
+        state.mouse_info().update_position(event.offset_x() as f64, event.offset_y() as f64);
     }) as Box<dyn FnMut(MouseEvent)>)
 }
 
 fn create_mouseup_handler(state: Rc<State>) -> Closure<dyn FnMut(MouseEvent)> {
     Closure::wrap(Box::new(move |_event: MouseEvent| {
-        state.mouse_info.released();
+        state.mouse_info().released();
     }) as Box<dyn FnMut(MouseEvent)>)
 }
 
