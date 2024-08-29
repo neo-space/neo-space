@@ -13,7 +13,7 @@ mod mouse;
 
 // TODO: Remove this comment
 #[wasm_bindgen(start)]
-fn start() -> Result<(), JsValue> { // indicates succeed w JsValue fail with no meaninful return value
+fn start() -> Result<(), JsValue> {
     // initialize the canvas element
     let document = web_sys::window().unwrap().document().unwrap();
     let canvas = document
@@ -32,24 +32,7 @@ fn start() -> Result<(), JsValue> { // indicates succeed w JsValue fail with no 
 
     // adding the mouse event handlers (clousures)
     add_mouse_event_listeners(&canvas, state.clone())?;
-
-    // render loop closure
-    // {
-    //     let f: Rc<RefCell<Option<Closure<dyn FnMut()>>>> = Rc::new(RefCell::new(None));
-    //     let g = f.clone();
-    //     *g.borrow_mut() = Some(Closure::wrap(Box::new(move || {
-    //         let state = state.clone();
-    //         if state.mouse_info().is_pressed() {
-    //             // TODO: there will be deeper functionality here based on user action mode
-    //             state.draw_line();
-    //         }
-    
-    //         request_animation_frame(f.borrow().as_ref().unwrap());
-    //     }) as Box<dyn FnMut()>));
-    
-    //     request_animation_frame(g.borrow().as_ref().unwrap());
-    // }
-    start_animation_loop(state.clone());
+    let _ = start_animation_loop(state.clone());
 
     Ok(())
 }
