@@ -6,7 +6,7 @@ members = [
     "rust-packages/hello-wasm",
     "rust-packages/paint-wasm",
     "rust-packages/infinite-paint-wasm"
-]
+, "rust-packages/neo-space-000"]
 
 
 [profile.release]
