@@ -15,6 +15,7 @@ Cargo.lock
 
 #notes
 notes/
+_notes/
 
 # Node.js
 node_modules/

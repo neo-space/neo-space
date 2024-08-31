@@ -1,0 +1,21 @@
+{
+  "name": "macro-cosmos",
+  "version": "1.0.0",
+  "description": "an infinite canvas that does what you want",
+  "scripts": {
+    "create-pkg": "mkdir -p pkg",
+    "build:wasm": "wasm-pack build --target web",
+    "build:webpack": "webpack --mode=development",
+    "build": "npm run create-pkg && npm run build:wasm && npm run build:webpack",
+    "start": "webpack serve --open",
+    "clean-install": "rm -rf node_modules && npm install",
+    "clean": "rm -rf pkg dist"
+  },
+  "devDependencies": {
+    "@wasm-tool/wasm-pack-plugin": "^1.6.0",
+    "copy-webpack-plugin": "^9.0.1",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.11.1"
+  }
+}
