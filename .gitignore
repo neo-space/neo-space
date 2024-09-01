@@ -49,7 +49,7 @@ build/
 *~
 
 # Operating System Files
-.DS_Store
+**/.DS_Store
 Thumbs.db
 
 # Debug logs
