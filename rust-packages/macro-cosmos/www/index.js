@@ -5,10 +5,16 @@ async function run() {
     const renderer = new Renderer();
     
     let isDrawing = false;
+    let isDragging = false;
     let startX, startY;
+    let lastX, lastY;
+    let userAction = 'drag'; // Default action
 
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+    const toolbar = document.getElementById('toolbar');
+    const squareBtn = document.getElementById('squareBtn');
+    const dragBtn = document.getElementById('dragBtn');
 
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -38,24 +44,68 @@ async function run() {
         );
     }
 
+    function isOverToolbar(e) {
+        const toolbarRect = toolbar.getBoundingClientRect();
+        return (
+            e.clientX >= toolbarRect.left &&
+            e.clientX <= toolbarRect.right &&
+            e.clientY >= toolbarRect.top &&
+            e.clientY <= toolbarRect.bottom
+        );
+    }
+
+    function updateCursor() {
+        if (userAction === 'drag') {
+            canvas.style.cursor = 'grab';
+        } else {
+            canvas.style.cursor = 'default';
+        }
+    }
+
     canvas.addEventListener('mousedown', (e) => {
-        isDrawing = true;
+        if (isOverToolbar(e)) return;
+        
         const pos = getMousePos(e.clientX, e.clientY);
-        startX = pos.x;
-        startY = pos.y;
+        startX = lastX = pos.x;
+        startY = lastY = pos.y;
+
+        if (userAction === 'square') {
+            isDrawing = true;
+        } else if (userAction === 'drag') {
+            isDragging = true;
+            canvas.style.cursor = 'grabbing';
+        }
     });
 
     canvas.addEventListener('mousemove', (e) => {
-        if (!isDrawing) return;
+        if (isOverToolbar(e)) return;
+
         const pos = getMousePos(e.clientX, e.clientY);
-        drawTranslucentSquare(startX, startY, pos.x, pos.y);
+
+        if (isDrawing) {
+            drawTranslucentSquare(startX, startY, pos.x, pos.y);
+        } else if (isDragging) {
+            const dx = pos.x - lastX;
+            const dy = pos.y - lastY;
+            // Implement dragging logic here (e.g., move the view)
+            console.log(`Dragged by dx: ${dx}, dy: ${dy}`);
+            lastX = pos.x;
+            lastY = pos.y;
+        }
     });
 
     canvas.addEventListener('mouseup', (e) => {
-        if (!isDrawing) return;
-        isDrawing = false;
+        if (isOverToolbar(e)) return;
+
         const pos = getMousePos(e.clientX, e.clientY);
-        renderer.add_square(startX, startY, pos.x, pos.y);
+
+        if (isDrawing) {
+            isDrawing = false;
+            renderer.add_square(startX, startY, pos.x, pos.y);
+        } else if (isDragging) {
+            isDragging = false;
+            updateCursor();
+        }
     });
 
     canvas.addEventListener('mouseleave', () => {
@@ -63,12 +113,27 @@ async function run() {
             isDrawing = false;
             renderer.draw_all_squares();  // Clear the translucent square
         }
+        if (isDragging) {
+            isDragging = false;
+            updateCursor();
+        }
+    });
+
+    squareBtn.addEventListener('click', () => {
+        userAction = 'square';
+        updateCursor();
+    });
+
+    dragBtn.addEventListener('click', () => {
+        userAction = 'drag';
+        updateCursor();
     });
 
     window.addEventListener('resize', resizeCanvas);
 
     // Initial setup
     resizeCanvas();
+    updateCursor();
 }
 
 run();
