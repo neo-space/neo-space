@@ -27,19 +27,17 @@ export class Renderer {
         });
     }
 
-    setDraggable(isDraggable) {
-        this.stage.draggable(isDraggable);
-    }
-
     createShape(type, config) {
         let shape;
         switch (type) {
             case 'rectangle':
                 shape = new Konva.Rect({
                     ...config,
-                    fill: 'transparent',
-                    stroke: 'black',
-                    strokeWidth: 2,
+                    fill: 'pink',
+                    stroke: 'pink',
+                    strokeWidth: 2,        
+                    shadowBlur: 10,
+                    cornerRadius: 10,
                 });
                 break;
             default:
