@@ -15,7 +15,7 @@ export function setupKonva() {
     });
 
     const layer = new Konva.Layer();
-    stage.add(layer);
+    stage.add(layer); // everything is currently on the same layer
 
     window.addEventListener('resize', () => {
         const newWidth = window.innerWidth;

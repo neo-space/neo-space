@@ -1,4 +1,5 @@
 import Konva from 'konva';
+import MouseTracker from './mouse';
 
 export class Renderer {
     constructor(containerId) {
@@ -10,13 +11,23 @@ export class Renderer {
 
         this.layer = new Konva.Layer();
         this.stage.add(this.layer);
+        // this is how to edit things or groups of things
+        this.transformer = new Konva.Transformer();
+        this.layer.add(this.transformer);
+        // lets add ability to draw selection rectangle
+        this.selectionRectangle = new Konva.Rect({
+            fill: 'rgba(173, 216, 230, 0.5)',
+            visible: false,
+            // disable events to not interrupt with events
+            listening: false,
+        });
+        this.layer.add(this.selectionRectangle);
 
-        this.shapes = [];
-        this.selectedShapes = [];
         this.isDrawing = false;
         this.drawingShape = null;
-
+        this.isSelecting = false;
         this.setupResizeHandler();
+        this.mouse = new MouseTracker();
     }
 
     setupResizeHandler() {
@@ -35,7 +46,7 @@ export class Renderer {
                     ...config,
                     fill: 'pink',
                     stroke: 'pink',
-                    strokeWidth: 2,        
+                    strokeWidth: 2,
                     shadowBlur: 10,
                     cornerRadius: 10,
                 });
@@ -45,110 +56,100 @@ export class Renderer {
                 return null;
         }
 
-        this.shapes.push(shape);
         this.layer.add(shape);
         this.layer.draw();
         return shape;
     }
 
-    startDrawing(pos) {
+    /**
+     * Konva uses a 0 based drawing system where the 0 is the top left corner
+     * That means we have to constantly be transforming grid coordinate system
+     *  that has nexative numbers on it to one that doesnt, which is done in
+     *  continueDrawing.
+     * @param { mouse position} pos 
+     */
+    startDrawing() {
+        const pos = this.stage.getPointerPosition();
         this.isDrawing = true;
+        this.drawingStartPos = pos;
         this.drawingShape = this.createShape('rectangle', {
             x: pos.x,
             y: pos.y,
             width: 0,
             height: 0,
+            cornerRadius: 0,
         });
     }
 
-    continueDrawing(pos) {
+    continueDrawing() {
         if (!this.isDrawing) return;
+        const pos = this.stage.getPointerPosition();
         const rect = this.drawingShape;
-        const newWidth = pos.x - rect.x();
-        const newHeight = pos.y - rect.y();
-        rect.width(newWidth);
-        rect.height(newHeight);
+        const startPos = this.drawingStartPos;
+
+        const x = Math.min(startPos.x, pos.x);
+        const y = Math.min(startPos.y, pos.y);
+        const width = Math.abs(pos.x - startPos.x);
+        const height = Math.abs(pos.y - startPos.y);
+        //TODO: make the rectangle draggable only when selected
+        rect.setAttrs({
+            x: x,
+            y: y,
+            name: 'rect',
+            width: width,
+            height: height,
+            draggable: true
+        });
+
         this.layer.batchDraw();
     }
 
     endDrawing() {
         this.isDrawing = false;
         this.drawingShape = null;
+        this.drawingStartPos = null;
     }
 
-    selectShape(shape) {
-        this.deselectAll();
-        shape.stroke('blue');
-        shape.strokeWidth(3);
-        this.selectedShapes.push(shape);
-        this.addTransformer(shape);
-        this.layer.draw();
+    /**
+     * here we will do the selection logic
+     */
+
+    startSelecting() {
+        const pos = this.stage.getPointerPosition();
+        this.mouse = new MouseTracker(pos.x, pos.y, pos.x, pos.y);
+        this.selectionRectangle.width(0);
+        this.selectionRectangle.height(0);
+        this.selecting = true;
     }
 
-    deselectAll() {
-        this.selectedShapes.forEach(shape => {
-            shape.stroke('black');
-            shape.strokeWidth(2);
-        });
-        this.selectedShapes = [];
-        this.removeTransformers();
-        this.layer.draw();
+    continueSelecting() {
+        //TODO: add prevent default for touch devices
+        //TODO: https://konvajs.org/docs/select_and_transform/Basic_demo.html
+        if (!this.selecting) return;
+        this.mouse.setCurrentPostition(this.stage.getPointerPosition().x,
+            this.stage.getPointerPosition().y);
+        // last position is really where they clicked
+        this.selectionRectangle.setAttrs({
+            visible: true,
+            x: Math.min(this.mouse.lastx, this.mouse.currentx),
+            y: Math.min(this.mouse.lasty, this.mouse.currenty),
+            width: Math.abs(this.mouse.currentx - this.mouse.lastx),
+            height: Math.abs(this.mouse.currenty - this.mouse.lasty),
+            });
     }
 
-    addTransformer(shape) {
-        const tr = new Konva.Transformer({
-            nodes: [shape],
-            keepRatio: false,
-            boundBoxFunc: (oldBox, newBox) => {
-                if (newBox.width < 5 || newBox.height < 5) {
-                    return oldBox;
-                }
-                return newBox;
-            },
-        });
-        this.layer.add(tr);
-    }
-
-    removeTransformers() {
-        this.stage.find('Transformer').destroy();
-    }
-
-    getShapesInArea(x1, y1, x2, y2) {
-        const box = new Konva.Rect({
-            x: Math.min(x1, x2),
-            y: Math.min(y1, y2),
-            width: Math.abs(x2 - x1),
-            height: Math.abs(y2 - y1),
-        });
-
-        return this.shapes.filter(shape => 
-            Konva.Util.haveIntersection(box.getClientRect(), shape.getClientRect())
+    endSelecting() {
+        this.selecting = false;
+        if (!this.selectionRectangle.visible()) {
+            return;
+        }
+        //TODO: prevent default behavior
+        this.selectionRectangle.visible(false);
+        var shapes = this.stage.find('.rect');
+        var box = this.selectionRectangle.getClientRect();
+        var selected = shapes.filter((shape) =>
+          Konva.Util.haveIntersection(box, shape.getClientRect())
         );
-    }
-
-    removeShape(shape) {
-        this.shapes = this.shapes.filter(s => s !== shape);
-        shape.destroy();
-        this.layer.draw();
-    }
-
-    clear() {
-        this.shapes.forEach(shape => shape.destroy());
-        this.shapes = [];
-        this.selectedShapes = [];
-        this.layer.draw();
-    }
-
-    toJSON() {
-        return this.stage.toJSON();
-    }
-
-    loadFromJSON(json) {
-        const stage = Konva.Node.create(json, 'container');
-        this.stage.destroy();
-        this.stage = stage;
-        this.layer = this.stage.findOne('Layer');
-        this.shapes = this.layer.getChildren();
-        this.selectedShapes = [];
+        this.transformer.nodes(selected);
     }
 }
