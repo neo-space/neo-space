@@ -135,7 +135,7 @@ export class Renderer {
             y: Math.min(this.mouse.lasty, this.mouse.currenty),
             width: Math.abs(this.mouse.currentx - this.mouse.lastx),
             height: Math.abs(this.mouse.currenty - this.mouse.lasty),
-            });
+        });
     }
 
     endSelecting() {
@@ -148,8 +148,27 @@ export class Renderer {
         var shapes = this.stage.find('.rect');
         var box = this.selectionRectangle.getClientRect();
         var selected = shapes.filter((shape) =>
-          Konva.Util.haveIntersection(box, shape.getClientRect())
+            Konva.Util.haveIntersection(box, shape.getClientRect())
         );
+        // these are references so removing from original or from here deletes
         this.transformer.nodes(selected);
+    }
+
+    deleteSelected() {
+        const selectedNodes = this.transformer.nodes();
+        if (selectedNodes.length > 0) {
+            // Remove each selected node from the stage
+            selectedNodes.forEach(node => {
+                node.destroy();
+            });
+
+            // Clear the transformer's nodes
+            this.transformer.nodes([]);
+
+            this.transformer.forceUpdate();
+
+            // Redraw the layer to reflect the changes
+            this.layer.batchDraw();
+        }
     }
 }
