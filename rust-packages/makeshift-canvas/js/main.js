@@ -1,9 +1,12 @@
-import '../styles.css';
-import './canvas.js';
-import './grid.js';
-import './tools.js';
-import './shapes.js';
-import './text.js';
-import './fileHandling.js';
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = initCanvas();
+    initTools(canvas);
 
-// Any additional initialization code can go here
+    // Resize canvas on window resize
+    window.addEventListener('resize', () => {
+        canvas.setDimensions({
+            width: window.innerWidth,
+            height: window.innerHeight
+        });
+    });
+});
