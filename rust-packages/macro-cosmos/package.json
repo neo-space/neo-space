@@ -6,9 +6,11 @@
     "create-pkg": "mkdir -p pkg",
     "build:wasm": "wasm-pack build --target web",
     "build:webpack": "webpack --mode=development",
-    "build": "npm run create-pkg && npm run build:wasm && npm run build:webpack",
-    "start": "webpack serve --open",
+    "build-wasm": "npm run create-pkg && npm run build:wasm && npm run build:webpack",
+    "start-wasm": "webpack serve --open",
     "clean-install": "rm -rf node_modules && npm install",
+    "build": "webpack --mode=production",
+    "start": "webpack serve --open --mode=development",
     "clean": "rm -rf pkg dist"
   },
   "devDependencies": {
