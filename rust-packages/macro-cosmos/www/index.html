@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,14 +32,17 @@
         }
     </style>
 </head>
-
 <body>
     <div id="toolbar">
         <button id="squareBtn">shape</button>
         <button id="selectBtn">select</button>
     </div>
     <div id="canvas-container"></div>
+    
+    <script src="https://unpkg.com/konva@9.3.14/konva.min.js"></script>
+    <script src="mouse.js"></script>
+    <script src="renderer.js"></script>
+    <script src="eventHandlers.js"></script>
     <script src="index.js" type="module"></script>
 </body>
-
 </html>
