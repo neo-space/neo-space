@@ -3,10 +3,10 @@
 [workspace]
 members = [ 
     "rendering-engine", 
-    "rust-packages/hello-wasm",
-    "rust-packages/paint-wasm",
-    "rust-packages/infinite-paint-wasm",
-    "rust-packages/macro-cosmos",
+    "monorepo/hello-wasm",
+    "monorepo/paint-wasm",
+    "monorepo/infinite-paint-wasm",
+    "monorepo/macro-cosmos",
 ]
 
 
